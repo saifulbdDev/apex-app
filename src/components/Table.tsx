@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Pagination from './Pagination';
 import {
+  PaginationState,
   useReactTable,
   getCoreRowModel,
   getFilteredRowModel,
@@ -10,14 +11,23 @@ import {
   getFacetedRowModel,
   getFacetedUniqueValues,
   getFacetedMinMaxValues,
+  OnChangeFn,
 } from '@tanstack/react-table';
 import { rankItem } from '@tanstack/match-sorter-utils';
+
+
 
 
 type TableProps = {
   children: React.ReactNode,
   data: any[];
   columns: any[];
+  pageCount:number;
+  pagination:{
+    pageIndex:number
+    pageSize:number
+  }
+  onPageChange?:  OnChangeFn<PaginationState>;
   globalFilter:string;
   isLoading?: boolean;
 };
@@ -37,8 +47,11 @@ const fuzzyFilter = (row: any, columnId: string, value: string, addMeta: Functio
 
 export const Table: React.FC<TableProps> = ({
   children,
+  pageCount,
+  pagination,
   data: tableData,
   columns: tableColumns,
+  onPageChange,
   globalFilter,
  
   isLoading = false,
@@ -49,14 +62,18 @@ export const Table: React.FC<TableProps> = ({
 
   const table = useReactTable({
     data,
+    pageCount,
     columns,
     filterFns: {
       fuzzy: fuzzyFilter,
     },
     state: {
       globalFilter,
+      pagination,
+
     },
     // onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange: onPageChange,
     globalFilterFn: fuzzyFilter,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -65,16 +82,11 @@ export const Table: React.FC<TableProps> = ({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
+    manualPagination: true,
+    manualFiltering: true,
   });
 
-  const pageIndex = table.getState().pagination.pageIndex;
-  const pageSize = table.getState().pagination.pageSize;
-  const rowsPerPage = table.getRowModel().rows.length;
-
-  // Calculate the current range of records being displayed
-  const startIndex = useMemo(() => pageIndex * pageSize, [pageIndex, pageSize]);
-  const endIndex = useMemo(() => startIndex + (rowsPerPage || 1 - 1), [startIndex, rowsPerPage]);
-
+  
   return (
     <div className="flex flex-col">
       <div className={`align-middle inline-block w-full overflow-hidden `}>
@@ -199,7 +211,7 @@ export const Table: React.FC<TableProps> = ({
                           <td
                             key={`${header.id}-loader-${i}`}
                             colSpan={header.colSpan}
-                            className="px-6 py-4 whitespace-nowrap"
+                            className="px-6 py-4 truncate"
                           >
                             <div className="flex items-center w-full">
                               <div className="text-sm text-gray-900 w-full">
@@ -219,7 +231,7 @@ export const Table: React.FC<TableProps> = ({
                           return (
                             <td
                               key={`${cell.id}-${i}`}
-                              className="whitespace-nowrap px-6 py-4 text-sm"
+                              className="truncate w-[200px] max-w-[200px] px-6 py-4 text-sm"
                             >
                               {flexRender(cell.column.columnDef.cell, cell.getContext())}
                             </td>
@@ -230,13 +242,13 @@ export const Table: React.FC<TableProps> = ({
                   })}
                 {!isLoading && !table?.getRowModel()?.rows?.length && (
                    //@ts-ignore
-                  <tr className="border-b text-center" ><td colSpan={20} className='text-center h-40'><div className='p-4'>Data Not found</div></td></tr>
+                  <tr className="border-b text-center" ><td colSpan={20} className='text-center h-40 max-w-[200px]'><div className='p-4'>Data Not found</div></td></tr>
                 )}
               </tbody>
             </table>
           </div>
 
-          <Pagination maxDisplayedPages={5} table={table} />
+          <Pagination  maxDisplayedPages={5} table={table} />
         </div>
       </div>
     </div>

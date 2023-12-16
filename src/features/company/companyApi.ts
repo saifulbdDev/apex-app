@@ -12,13 +12,14 @@ export const companyApi = apiSlice.injectEndpoints({
       query: (data) => {
         let url = "get-all-companys";
 
-        if (data?.category) {
-          url += `/category/${data.category}`;
+        if (data?.currentPage) {
+          url += `?page=${data.currentPage}`;
         }
 
-        if (data?.sort) {
-          url += `?sort=${data.sort}`;
+        if (data?.company_name) {
+          url += `&company_status=1&company_name=${data.company_name}`;
         }
+        
 
         return {
           url: url,

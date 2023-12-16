@@ -18,3 +18,7 @@ export interface Company {
     created_at: string;
     updated_at: string;
   }
+  export type PaginationState = {
+    pageIndex: number
+    pageSize: number
+  }

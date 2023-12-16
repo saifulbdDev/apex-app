@@ -1,9 +1,11 @@
-import React from 'react';
+
+import React, {useEffect} from 'react';
 import ArrowRight from '@/assets/icons/ArrowRight';
 
 interface PaginationProps {
   table: any; // Replace 'any' with the type of your table object
   maxDisplayedPages: number;
+ 
 }
 
 const Pagination: React.FC<PaginationProps> = ({ table, maxDisplayedPages = 5 }) => {
@@ -40,6 +42,9 @@ const Pagination: React.FC<PaginationProps> = ({ table, maxDisplayedPages = 5 })
     pageNumbers.push(rangeEnd + 1);
   }
 
+
+ 
+ 
   return (
     <>
       {totalPageCount > 0 && (
@@ -84,7 +89,9 @@ const Pagination: React.FC<PaginationProps> = ({ table, maxDisplayedPages = 5 })
                   className="relative inline-flex items-center px-2 py-2 text-gray-400 rounded-l-md ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
                 >
                   <span className="sr-only">Previous</span>
-                  <ArrowRight className="w-5 h-5" aria-hidden="true" />
+                  <ArrowRight className={`w-5 h-5 rotate-180 ${
+                    !table.getCanPreviousPage() ? 'stroke-[#9CA3AF]' : 'stroke-black'
+                  }`} aria-hidden="true" />
                 </button>
                 {pageNumbers.map((pageNumber, index) => (
                   <React.Fragment key={index}>
@@ -110,12 +117,12 @@ const Pagination: React.FC<PaginationProps> = ({ table, maxDisplayedPages = 5 })
                 <button
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
-                  className={`${
-                    !table.getCanPreviousPage() ? 'text-[#9CA3AF]' : 'text-black'
-                  } relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0`}
+                  className={` relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0`}
                 >
                   <span className="sr-only">Next</span>
-                  <ArrowRight className="w-5 h-5" aria-hidden="true" />
+                  <ArrowRight className={`w-5 h-5 ${
+                    !table.getCanPreviousPage() ? 'stroke-[#9CA3AF]' : 'stroke-black'
+                  }`} aria-hidden="true" />
                 </button>
               </nav>
             </div>
